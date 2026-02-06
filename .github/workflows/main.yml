@@ -1,0 +1,33 @@
+name: Atualizar Agenda Mensalmente
+
+on:
+  schedule:
+    # Roda todo dia 1 de cada mês às 00:00 UTC
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # Permite que você clique em um botão para rodar agora
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar Bibliotecas
+        run: pip install requests beautifulsoup4
+
+      - name: Rodar Script
+        run: python busca_dados.py
+
+      - name: Salvar Mudanças
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add agenda_2026.json
+          git commit -m "Agenda atualizada via bot" || exit 0
+          git push
